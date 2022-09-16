@@ -12,8 +12,14 @@ public class EnemyAI : MonoBehaviour
     public float cooldown;
     float countdown;
 
+    public float patrolCooldown;
+    float patrolCountdown;
+    public Transform[] moveSpots;
+    int randomSpot;
+
     public Transform target;
     public GameObject bullet;
+    float epsilon = 0.2f;
 
     Rigidbody2D rb;
     Vector2 movement;
@@ -24,6 +30,8 @@ public class EnemyAI : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         countdown = cooldown;
+        patrolCountdown = patrolCooldown;
+        randomSpot = Random.Range(0, moveSpots.Length);
     }   
 
     // Update is called once per frame
@@ -50,6 +58,8 @@ public class EnemyAI : MonoBehaviour
             if (isChasing) {
                 MoveCharacter(movement);
                 Shoot();
+            } else {
+                Patrol();
             }
     }
 
@@ -66,6 +76,20 @@ public class EnemyAI : MonoBehaviour
         if (countdown <= 0) {
             Instantiate(bullet, transform.position, Quaternion.identity);
             countdown = cooldown;
+        }
+    }
+
+    void Patrol()
+    {
+        transform.position = Vector2.MoveTowards(transform.position, moveSpots[randomSpot].position, speed * Time.deltaTime);
+
+        if (Vector2.Distance(transform.position, moveSpots[randomSpot].position) < epsilon) {
+            if (patrolCountdown <= 0) {
+                randomSpot = Random.Range(0, moveSpots.Length);
+                patrolCountdown = patrolCooldown;
+            } else {
+                patrolCountdown -= Time.deltaTime;
+            }
         }
     }
 }

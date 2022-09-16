@@ -5,21 +5,23 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public float speed;
-    public EnemyAI ai;
+    Transform player;
+    float epsilon = 0.2f;
 
     Vector2 targetVector;
 
     // Start is called before the first frame update
     void Start()
     {
-        targetVector = new Vector2(ai.target.position.x, ai.target.position.y);
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        targetVector = new Vector2(player.position.x, player.position.y);
     }
 
     // Update is called once per frame
     void Update()
     {
         transform.position = Vector2.MoveTowards(transform.position, targetVector, speed * Time.deltaTime);
-        if (transform.position.x == targetVector.x && transform.position.y == targetVector.y)
+        if (Vector2.Distance(transform.position, player.position) < epsilon)
             DestroyBullet();
     }
 
